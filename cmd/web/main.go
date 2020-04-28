@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"github.com/daksh-sagar/snippetbox/pkg/models/mysql"
@@ -8,14 +9,15 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	snippets *mysql.SnippetModel
+	errorLog      *log.Logger
+	infoLog       *log.Logger
+	snippets      *mysql.SnippetModel
 	templateCache map[string]*template.Template
 }
 
@@ -40,20 +42,29 @@ func main() {
 	}
 
 	app := &application{
-		errorLog: errLog,
-		infoLog:  infoLog,
-		snippets: &mysql.SnippetModel{DB: db},
+		errorLog:      errLog,
+		infoLog:       infoLog,
+		snippets:      &mysql.SnippetModel{DB: db},
 		templateCache: templateCache,
 	}
 
+	tlsConfig := &tls.Config{
+		PreferServerCipherSuites: true,
+		CurvePreferences:         []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
+
 	server := &http.Server{
-		Addr:     *addr,
-		ErrorLog: errLog,
-		Handler:  app.routes(),
+		Addr:         *addr,
+		ErrorLog:     errLog,
+		Handler:      app.routes(),
+		TLSConfig:    tlsConfig,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	infoLog.Printf("Starting server on %s\n", *addr)
-	err = server.ListenAndServe()
+	err = server.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	errLog.Fatal(err)
 }
 
