@@ -12,14 +12,14 @@
             </div>
             <div>
                 <label for="content">Content:</label>
-                {{with .Errors.GET "content"}}
+                {{with .Errors.Get "content"}}
                     <label class='error'>{{.}}</label>
                 {{end}}
                 <textarea id="content" name='content'>{{.Get "content"}}</textarea>
             </div>
             <div>
                 <label>Delete in:</label>
-                {{with .Errors.GET "expires"}}
+                {{with .Errors.Get "expires"}}
                     <label class='error'>{{.}}</label>
                 {{end}}
                 {{$exp := or (.Get "expires") "365"}}
