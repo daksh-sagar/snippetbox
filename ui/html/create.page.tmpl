@@ -5,7 +5,7 @@
         {{with .Form}}
             <div>
                 <label for="title">Title:</label>
-                {{with .Errors.GET "title"}}
+                {{with .Errors.Get "title"}}
                     <label class="error">{{.}}</label>
                 {{end}}
                 <input id="title" type='text' name='title' value='{{.Get "title"}}'>
