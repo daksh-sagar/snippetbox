@@ -20,6 +20,8 @@ func (app *application) routes() http.Handler {
 	mux.Get("/user/login", app.session.Enable(noSurf(app.authenticate(http.HandlerFunc(app.loginUserForm)))))
 	mux.Post("/user/login", app.session.Enable(noSurf(app.authenticate(http.HandlerFunc(app.loginUser)))))
 	mux.Post("/user/logout", app.session.Enable(noSurf(app.authenticate(app.requireAuthentication(http.HandlerFunc(app.logoutUser))))))
+	mux.Get("/user/change-password", app.session.Enable(noSurf(app.authenticate(app.requireAuthentication(http.HandlerFunc(app.changePasswordForm))))))
+	mux.Post("/user/change-password", app.session.Enable(noSurf(app.authenticate(app.requireAuthentication(http.HandlerFunc(app.changePassword))))))
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	mux.Get("/static/", http.StripPrefix("/static", fileServer))
